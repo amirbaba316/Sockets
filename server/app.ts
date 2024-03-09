@@ -10,10 +10,20 @@ const app = express();
 
 const server = http.createServer(app)
 
-const io = new Server(server); //socket server was created.
+const io = new Server(server,{
+    cors:{
+        origin:'*'
+    }
+}); //socket server was created.
 
 io.on('connection',(socket)=>{
-    console.log(socket)
+    console.log('connection was established');
+    socket.on('chat',(data)=>{
+        io.emit('chat',data)
+    })
+    socket.on('disconnect',()=>{
+        console.log('connection was disconnected')
+    })
 });
 
 const port = process.env.PORT;
