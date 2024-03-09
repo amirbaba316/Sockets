@@ -1,15 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { io } from 'socket.io-client';
 
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
-
 function App() {
+    const inputRef = useRef<null | HTMLInputElement>(null);
     const socket = io('localhost:2915');
 
-    const [count, setCount] = useState(0);
+    const [messages] = useState<string[]>([]);
+
+    // , setMessages
 
     useEffect(() => {
         socket.emit('hello', 'some data ');
@@ -18,21 +17,22 @@ function App() {
     return (
         <>
             <div>
-                <a href='https://vitejs.dev' target='_blank'>
-                    <img src={viteLogo} className='logo' alt='Vite logo' />
-                </a>
-                <a href='https://react.dev' target='_blank'>
-                    <img src={reactLogo} className='logo react' alt='React logo' />
-                </a>
+                <div>
+                    {messages.map((message) => (
+                        <div>{message}</div>
+                    ))}
+                </div>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        console.log(`pre emit ${inputRef.current?.value}`);
+                        socket.emit('chat', inputRef.current?.value);
+                    }}
+                >
+                    <input ref={inputRef} type='text' name='messge' />
+                    <button type='submit'> Send </button>
+                </form>
             </div>
-            <h1>Vite + React</h1>
-            <div className='card'>
-                <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-                <p>
-                    Edit <code>src/App.tsx</code> and save to test HMR
-                </p>
-            </div>
-            <p className='read-the-docs'>Click on the Vite and React logos to learn more</p>
         </>
     );
 }
